@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MailKit" Version="2.9.0" />
     <PackageReference Include="MimeKit" Version="2.9.2" />
     <PackageReference Include="Razor.Templating.Core" Version="1.2.1" />
   </ItemGroup>

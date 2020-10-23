@@ -2,7 +2,7 @@
 
 namespace Mailocomotive
 {
-    public class Class1
+    public class Email
     {
     }
 }
