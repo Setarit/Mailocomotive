@@ -1,4 +1,4 @@
-﻿namespace Mailocomotive.Configuration.Multiple
+﻿namespace Mailocomotive.Setting.Multiple
 {
     public interface MailProviderCollection
     {

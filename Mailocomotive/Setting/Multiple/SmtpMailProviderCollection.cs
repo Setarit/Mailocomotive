@@ -1,4 +1,4 @@
-﻿using Mailocomotive.Configuration.Single;
+﻿using Mailocomotive.Setting.Single;
 
 namespace Mailocomotive.Configuration.Multiple
 {
