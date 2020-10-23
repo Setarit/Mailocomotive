@@ -1,6 +1,6 @@
 ﻿namespace Mailocomotive.Setting.Single
 {
-    public interface MailProvider
+    public interface MailProvider:Provider
     {
     }
 }

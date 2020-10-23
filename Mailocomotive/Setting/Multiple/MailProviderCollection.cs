@@ -1,6 +1,6 @@
 ﻿namespace Mailocomotive.Setting.Multiple
 {
-    public interface MailProviderCollection
+    public interface MailProviderCollection:Provider
     {
     }
 }
