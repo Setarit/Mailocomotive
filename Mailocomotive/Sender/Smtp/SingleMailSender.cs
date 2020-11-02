@@ -3,43 +3,46 @@ using MailKit.Net.Smtp;
 using System.Threading.Tasks;
 using Mailocomotive.Setting.Single;
 using System;
+using Mailocomotive.Message;
 
 namespace Mailocomotive.Sender.Smtp
 {
     class SingleMailSender<T> : Sender<T>
     {
         private readonly SmtpMailProvider mailProvider;
-        private BodyBuilder builder;
 
         public SingleMailSender(SmtpMailProvider mailProvider)
-        {            
-            builder = new BodyBuilder();
+        {
             this.mailProvider = mailProvider;
         }
 
         public async Task<bool> SendAsync(Email<T> mail)
-        {            
-            builder.HtmlBody = await BuildBodyAsync(mail);            
-            mail.Message.Body = builder.ToMessageBody();
+        {
+            var message = await LoadMimeMessageAsync(mail);
             using (var client = new SmtpClient())
             {
-                //client.ServerCertificateValidationCallback = (s, c, h, e) => true;//security vulnerability!
                 await client.ConnectAsync(mailProvider.Host, mailProvider.Port, MailKit.Security.SecureSocketOptions.StartTls);
                 await client.AuthenticateAsync(mailProvider.Username, mailProvider.Password);
-                await client.SendAsync(mail.Message);
+                await client.SendAsync(message);
                 await client.DisconnectAsync(true);
                 client.Dispose();//release attachments
             }
             return true;
         }
 
-        private Task<string> BuildBodyAsync(Email<T> mail)
+        private async Task<MimeMessage> LoadMimeMessageAsync(Email<T> mail)
         {
-            foreach(var attachnment in mail.AttachmentPaths)
-            {
-                builder.Attachments.Add(attachnment);
-            }
-            return mail.RenderAsync(Render.RenderType.STRING);
+            var builder = new MimeMessageBuilder(
+                body: (await mail.RenderAsync(Render.RenderType.STRING)).ToString(),
+                subject: mail.MessageSubject,
+                ToHeaders: mail.ToHeaders,
+                ReplyToHeaders: mail.ReplyToHeaders,
+                FromHeaders: mail.FromHeaders,
+                CcHeaders: mail.CcHeaders,
+                BccHeaders: mail.BccHeaders,
+                attachmentPaths: mail.AttachmentPaths
+                );
+            return builder.Build();
         }
     }
     
