@@ -1,4 +1,5 @@
-﻿using Mailocomotive.Render;
+﻿using Mailocomotive.Message;
+using Mailocomotive.Render;
 using MimeKit;
 using System.Collections.Generic;
 
@@ -6,12 +7,21 @@ namespace Mailocomotive
 {
     public abstract class Email<T>
     {
-        internal MimeMessage Message { get; private set; }
+        internal IList<Address> ToHeaders { get; private set; }
+        internal IList<Address> ReplyToHeaders { get; private set; }
+        internal IList<Address> FromHeaders { get; private set; }
+        internal IList<Address> CcHeaders { get; private set; }
+        internal IList<Address> BccHeaders { get; private set; }
+        internal string MessageSubject { get; private set; }
         internal IList<string> AttachmentPaths { get; private set; }
 
         public Email()
         {
-            Message = new MimeMessage();
+            ToHeaders = new List<Address>();
+            ReplyToHeaders = new List<Address>(1);
+            FromHeaders = new List<Address>(1);
+            BccHeaders = new List<Address>();
+            CcHeaders = new List<Address>();
             AttachmentPaths = new List<string>(5);
         }
 
@@ -24,8 +34,12 @@ namespace Mailocomotive
         /// <returns></returns>
         public Email<T> To(string displayName, string address, bool flush = true)
         {
-            if (flush) Message.To.Clear();
-            Message.To.Add(new MailboxAddress(displayName, address));
+            if (flush) ToHeaders.Clear();
+            ToHeaders.Add(new Address
+            {
+                DisplayName = displayName,
+                MailAddress = address
+            });
             return this;
         }
 
@@ -38,8 +52,12 @@ namespace Mailocomotive
         /// <returns></returns>
         public Email<T> ReplyTo(string displayName, string address, bool flush = true)
         {
-            if (flush) Message.ReplyTo.Clear();
-            Message.ReplyTo.Add(new MailboxAddress(displayName, address));
+            if (flush) ReplyToHeaders.Clear();
+            ReplyToHeaders.Add(new Address
+            {
+                DisplayName = displayName,
+                MailAddress = address
+            });
             return this;
         }
 
@@ -51,8 +69,12 @@ namespace Mailocomotive
         /// <param name="flush">False if the previous origins in the <code>FROM</code> header should be kept</param>
         /// <returns></returns>
         public Email<T> From(string displayName, string address, bool flush = true) {
-            if (flush) Message.From.Clear();
-            Message.From.Add(new MailboxAddress(displayName, address));
+            if (flush) FromHeaders.Clear();
+            FromHeaders.Add(new Address
+            {
+                DisplayName = displayName,
+                MailAddress = address
+            });
             return this;
         }
 
@@ -65,8 +87,12 @@ namespace Mailocomotive
         /// <returns></returns>
         public Email<T> Cc(string displayName, string address, bool flush = true)
         {
-            if (flush) Message.Cc.Clear();
-            Message.Cc.Add(new MailboxAddress(displayName, address));
+            if (flush) CcHeaders.Clear();
+            CcHeaders.Add(new Address
+            {
+                DisplayName = displayName,
+                MailAddress = address
+            });
             return this;
         }
 
@@ -79,8 +105,12 @@ namespace Mailocomotive
         /// <returns></returns>
         public Email<T> Bcc(string displayName, string address, bool flush = true)
         {
-            if (flush) Message.Bcc.Clear();
-            Message.Bcc.Add(new MailboxAddress(displayName, address));
+            if (flush) BccHeaders.Clear();
+            BccHeaders.Add(new Address
+            {
+                DisplayName = displayName,
+                MailAddress = address
+            });
             return this;
         }
 
@@ -91,7 +121,7 @@ namespace Mailocomotive
         /// <returns></returns>
         public Email<T> Subject(string subject)
         {
-            Message.Subject = subject;
+            MessageSubject = subject;
             return this;
         }
 
