@@ -1,10 +1,6 @@
 ﻿using MimeKit;
 using MailKit.Net.Smtp;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
-using Mailocomotive.Configuration;
 using Mailocomotive.Setting.Single;
 
 namespace Mailocomotive.Sender.Smtp
