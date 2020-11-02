@@ -1,19 +1,18 @@
-﻿using MimeKit;
-using System;
-using System.Collections;
+﻿using Mailocomotive.Render;
+using MimeKit;
 using System.Collections.Generic;
 
 namespace Mailocomotive
 {
     public abstract class Email<T>
     {
-        private MimeMessage message;
-        private IList<string> attachmentPaths;
+        internal MimeMessage Message { get; private set; }
+        internal IList<string> AttachmentPaths { get; private set; }
 
         public Email()
         {
-            message = new MimeMessage();
-            attachmentPaths = new List<string>(5);
+            Message = new MimeMessage();
+            AttachmentPaths = new List<string>(5);
         }
 
         /// <summary>
@@ -25,8 +24,8 @@ namespace Mailocomotive
         /// <returns></returns>
         public Email<T> To(string displayName, string address, bool flush = true)
         {
-            if (flush) message.To.Clear();
-            message.To.Add(new MailboxAddress(displayName, address));
+            if (flush) Message.To.Clear();
+            Message.To.Add(new MailboxAddress(displayName, address));
             return this;
         }
 
@@ -39,8 +38,8 @@ namespace Mailocomotive
         /// <returns></returns>
         public Email<T> ReplyTo(string displayName, string address, bool flush = true)
         {
-            if (flush) message.ReplyTo.Clear();
-            message.ReplyTo.Add(new MailboxAddress(displayName, address));
+            if (flush) Message.ReplyTo.Clear();
+            Message.ReplyTo.Add(new MailboxAddress(displayName, address));
             return this;
         }
 
@@ -52,8 +51,8 @@ namespace Mailocomotive
         /// <param name="flush">False if the previous origins in the <code>FROM</code> header should be kept</param>
         /// <returns></returns>
         public Email<T> From(string displayName, string address, bool flush = true) {
-            if (flush) message.From.Clear();
-            message.From.Add(new MailboxAddress(displayName, address));
+            if (flush) Message.From.Clear();
+            Message.From.Add(new MailboxAddress(displayName, address));
             return this;
         }
 
@@ -66,8 +65,8 @@ namespace Mailocomotive
         /// <returns></returns>
         public Email<T> Cc(string displayName, string address, bool flush = true)
         {
-            if (flush) message.Cc.Clear();
-            message.Cc.Add(new MailboxAddress(displayName, address));
+            if (flush) Message.Cc.Clear();
+            Message.Cc.Add(new MailboxAddress(displayName, address));
             return this;
         }
 
@@ -80,8 +79,8 @@ namespace Mailocomotive
         /// <returns></returns>
         public Email<T> Bcc(string displayName, string address, bool flush = true)
         {
-            if (flush) message.Bcc.Clear();
-            message.Bcc.Add(new MailboxAddress(displayName, address));
+            if (flush) Message.Bcc.Clear();
+            Message.Bcc.Add(new MailboxAddress(displayName, address));
             return this;
         }
 
@@ -92,7 +91,7 @@ namespace Mailocomotive
         /// <returns></returns>
         public Email<T> Subject(string subject)
         {
-            message.Subject = subject;
+            Message.Subject = subject;
             return this;
         }
 
@@ -103,17 +102,8 @@ namespace Mailocomotive
         /// <returns></returns>
         public Email<T> Attach(string absolutePathToAttachment)
         {
-            attachmentPaths.Add(absolutePathToAttachment);
+            AttachmentPaths.Add(absolutePathToAttachment);
             return this;
-        }
-
-        /// <summary>
-        /// Gets the paths to the attachments
-        /// </summary>
-        /// <returns>The list of attachments</returns>
-        internal IList<string> GetAttachmentPaths()
-        {
-            return this.attachmentPaths;
         }
 
         /// <summary>
@@ -132,9 +122,10 @@ namespace Mailocomotive
         /// Renders the email to string
         /// </summary>
         /// <returns>The rendered email</returns>
-        public string Render()
+        public async System.Threading.Tasks.Task<string> RenderAsync(RenderType type)
         {
-            throw new NotImplementedException();
+            var renderer = (new Factory.Render.Factory<T>()).Create(type);
+            return (await renderer.RenderAsync(BuildViewModel(), ViewPath)).ToString();
         }
 
         /// <summary>
