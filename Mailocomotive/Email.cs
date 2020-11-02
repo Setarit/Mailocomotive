@@ -10,6 +10,12 @@ namespace Mailocomotive
         private MimeMessage message;
         private IList<string> attachmentPaths;
 
+        public Email()
+        {
+            message = new MimeMessage();
+            attachmentPaths = new List<string>(5);
+        }
+
         /// <summary>
         /// Where the email should be sent to
         /// </summary>
@@ -102,6 +108,15 @@ namespace Mailocomotive
         }
 
         /// <summary>
+        /// Gets the paths to the attachments
+        /// </summary>
+        /// <returns>The list of attachments</returns>
+        internal IList<string> GetAttachmentPaths()
+        {
+            return this.attachmentPaths;
+        }
+
+        /// <summary>
         /// Builds the viewmodel for the email
         /// Override this method
         /// </summary>
@@ -126,9 +141,10 @@ namespace Mailocomotive
         /// Sends the email
         /// </summary>
         /// <returns>True if sent</returns>
-        public bool Send()
+        public async System.Threading.Tasks.Task<bool> SendAsync()
         {
-            throw new NotImplementedException();
+            var sender = (new Factory.Sender.Factory()).Create();
+            return await sender.Send(this);
         }
     }
 }

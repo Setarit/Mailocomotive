@@ -2,10 +2,11 @@
 using MailKit.Net.Smtp;
 using System.Threading.Tasks;
 using Mailocomotive.Setting.Single;
+using System;
 
 namespace Mailocomotive.Sender.Smtp
 {
-    class SingleMailSender : Sender
+    class SingleMailSender<T> : Sender<T>
     {
         private readonly SmtpMailProvider mailProvider;
         private MimeMessage message;
@@ -18,9 +19,9 @@ namespace Mailocomotive.Sender.Smtp
             this.mailProvider = mailProvider;
         }
 
-        public async Task<bool> Send(Email mail)
+        public async Task<bool> SendAsync(Email<T> mail)
         {            
-            builder.HtmlBody = await BuildBodyAsync();
+            builder.HtmlBody = await BuildBodyAsync(mail);
             message.Body = builder.ToMessageBody();
             using (var client = new SmtpClient())
             {
@@ -32,6 +33,15 @@ namespace Mailocomotive.Sender.Smtp
                 client.Dispose();//release attachments
             }
             return true;
+        }
+
+        private Task<string> BuildBodyAsync(Email<T> mail)
+        {
+            foreach(var attachnment in mail.GetAttachmentPaths())
+            {
+                builder.Attachments.Add(attachnment);
+            }
+            //todo render to string
         }
     }
     
