@@ -7,7 +7,7 @@ using Mailocomotive.Message;
 
 namespace Mailocomotive.Sender.Smtp
 {
-    class SingleMailSender<T> : Sender<T>
+    internal class SingleMailSender<T> : Sender<T>
     {
         private readonly SmtpMailProvider mailProvider;
 
@@ -16,7 +16,7 @@ namespace Mailocomotive.Sender.Smtp
             this.mailProvider = mailProvider;
         }
 
-        public async Task<bool> SendAsync(Email<T> mail)
+        async Task<bool> Sender<T>.SendAsync(Email<T> mail)
         {
             var message = await LoadMimeMessageAsync(mail);
             using (var client = new SmtpClient())
