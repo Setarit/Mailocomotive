@@ -4,16 +4,16 @@ using System.Threading.Tasks;
 
 namespace Mailocomotive.Sender.Smtp
 {
-    internal class RotatingMailCollectionSender<T> : Multiple.RotatingMailCollectionSender<T>
+    internal class RotatingMailCollectionSender<TViewModel> : Multiple.RotatingMailCollectionSender<TViewModel>
     {
         public RotatingMailCollectionSender(MailProviderCollection mailProviderCollection):base(mailProviderCollection)
         {
 
         }
 
-        protected override async Task<bool> SendWithProvider(MailProvider mailProvider, Email<T> mail)
+        protected override async Task<bool> SendWithProvider(MailProvider mailProvider, Email<TViewModel> mail)
         {
-            SingleMailSender<T> sender = (new SingleMailSender<T>((SmtpMailProvider)mailProvider));            
+            SingleMailSender<TViewModel> sender = (new SingleMailSender<TViewModel>((SmtpMailProvider)mailProvider));            
             return await sender.SendAsync(mail);
         }
     }

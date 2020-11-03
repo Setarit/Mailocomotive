@@ -12,7 +12,7 @@ namespace Mailocomotive.Sender.Multiple
     /// When all the providers in the collection fail, it will throw the exception from the last provider
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    internal abstract class RandomMailCollectionSender<T> : Sender<T>
+    internal abstract class RandomMailCollectionSender<TViewModel> : Sender<TViewModel>
     {
         private readonly MailProviderCollection mailProviderCollection;
 
@@ -21,7 +21,7 @@ namespace Mailocomotive.Sender.Multiple
             this.mailProviderCollection = mailProviderCollection;
         }
 
-        async Task<bool> Sender<T>.SendAsync(Email<T> mail)
+        async Task<bool> Sender<TViewModel>.SendAsync(Email<TViewModel> mail)
         {
             var random = new Random();
             IList<bool> used = new bool[mailProviderCollection.Collection.Length];
@@ -50,6 +50,6 @@ namespace Mailocomotive.Sender.Multiple
             return sent;
         }
 
-        protected abstract Task<bool> SendWithProvider(Setting.Single.MailProvider mailProvider, Email<T> mail);
+        protected abstract Task<bool> SendWithProvider(Setting.Single.MailProvider mailProvider, Email<TViewModel> mail);
     }
 }

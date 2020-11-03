@@ -2,9 +2,9 @@
 
 namespace Mailocomotive.Render
 {
-    internal class StringRenderer<T> : Renderer<T>
+    internal class StringRenderer<TViewModel> : Renderer<TViewModel>
     {
-        public async System.Threading.Tasks.Task<object> RenderAsync(T viewModel, string view)
+        public async System.Threading.Tasks.Task<object> RenderAsync(TViewModel viewModel, string view)
         {
             return await RazorTemplateEngine.RenderAsync(view, viewModel);
         }

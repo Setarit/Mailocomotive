@@ -3,15 +3,15 @@ using System;
 
 namespace Mailocomotive.Factory.Render
 {
-    internal class Factory<T>
+    internal class Factory<TViewModel>
     {
-        internal Renderer<T> Create(RenderType type)
+        internal Renderer<TViewModel> Create(RenderType type)
         {
-            Renderer<T> result = null;
+            Renderer<TViewModel> result = null;
             switch (type)
             {
                 case RenderType.STRING:
-                    result = new StringRenderer<T>();
+                    result = new StringRenderer<TViewModel>();
                     break;
                 default:
                     throw new Exception("Unsupported render type");                    

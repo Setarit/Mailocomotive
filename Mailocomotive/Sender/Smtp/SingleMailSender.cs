@@ -7,7 +7,7 @@ using Mailocomotive.Message;
 
 namespace Mailocomotive.Sender.Smtp
 {
-    internal class SingleMailSender<T> : Sender<T>
+    class SingleMailSender<TViewModel> : Sender<TViewModel>
     {
         private readonly SmtpMailProvider mailProvider;
 
@@ -16,7 +16,7 @@ namespace Mailocomotive.Sender.Smtp
             this.mailProvider = mailProvider;
         }
 
-        async Task<bool> Sender<T>.SendAsync(Email<T> mail)
+        public async Task<bool> SendAsync(Email<TViewModel> mail)
         {
             var message = await LoadMimeMessageAsync(mail);
             using (var client = new SmtpClient())
@@ -30,7 +30,7 @@ namespace Mailocomotive.Sender.Smtp
             return true;
         }
 
-        private async Task<MimeMessage> LoadMimeMessageAsync(Email<T> mail)
+        private async Task<MimeMessage> LoadMimeMessageAsync(Email<TViewModel> mail)
         {
             var builder = new MimeMessageBuilder(
                 body: (await mail.RenderAsync(Render.RenderType.STRING)).ToString(),

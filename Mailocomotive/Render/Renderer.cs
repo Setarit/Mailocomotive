@@ -2,12 +2,12 @@
 
 namespace Mailocomotive.Render
 {
-    internal interface Renderer<T>
+    internal interface Renderer<TViewModel>
     {
         /// <summary>
         /// Renders the email
         /// </summary>
         /// <returns></returns>
-        Task<object> RenderAsync(T viewModel, string view);
+        Task<object> RenderAsync(TViewModel viewModel, string view);
     }
 }

@@ -11,7 +11,7 @@ namespace Mailocomotive.Sender.Multiple
     /// Throws the last exception if all failed with exception
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    internal abstract class RotatingMailCollectionSender<T> : Sender<T>
+    internal abstract class RotatingMailCollectionSender<TViewModel> : Sender<TViewModel>
     {
         private readonly MailProviderCollection mailProviderCollection;
 
@@ -20,7 +20,7 @@ namespace Mailocomotive.Sender.Multiple
             this.mailProviderCollection = mailProviderCollection;
         }
 
-        async Task<bool> Sender<T>.SendAsync(Email<T> mail)
+        async Task<bool> Sender<TViewModel>.SendAsync(Email<TViewModel> mail)
         {
             Exception lastException = null;
             bool sent = false;
@@ -41,6 +41,6 @@ namespace Mailocomotive.Sender.Multiple
             return sent;
         }
 
-        protected abstract Task<bool> SendWithProvider(Setting.Single.MailProvider mailProvider, Email<T> mail);
+        protected abstract Task<bool> SendWithProvider(Setting.Single.MailProvider mailProvider, Email<TViewModel> mail);
     }
 }

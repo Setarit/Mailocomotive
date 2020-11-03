@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Mailocomotive
 {
-    public abstract class Email<T>
+    public abstract class Email<TViewModel>
     {
         internal IList<Address> ToHeaders { get; private set; }
         internal IList<Address> ReplyToHeaders { get; private set; }
@@ -32,7 +32,7 @@ namespace Mailocomotive
         /// <param name="address">The emailaddress of the recipient</param>
         /// <param name="flush">False if the previous recipients in the <code>TO</code> header should be kept</param>
         /// <returns></returns>
-        public Email<T> To(string displayName, string address, bool flush = true)
+        public Email<TViewModel> To(string displayName, string address, bool flush = true)
         {
             if (flush) ToHeaders.Clear();
             ToHeaders.Add(new Address
@@ -50,7 +50,7 @@ namespace Mailocomotive
         /// <param name="address">The emailaddress for replying</param>
         /// <param name="flush">False if the previous addresses in the <code>REPLYTO</code> header should be kept</param>
         /// <returns></returns>
-        public Email<T> ReplyTo(string displayName, string address, bool flush = true)
+        public Email<TViewModel> ReplyTo(string displayName, string address, bool flush = true)
         {
             if (flush) ReplyToHeaders.Clear();
             ReplyToHeaders.Add(new Address
@@ -68,7 +68,7 @@ namespace Mailocomotive
         /// <param name="address">The emailaddress of the origin</param>
         /// <param name="flush">False if the previous origins in the <code>FROM</code> header should be kept</param>
         /// <returns></returns>
-        public Email<T> From(string displayName, string address, bool flush = true) {
+        public Email<TViewModel> From(string displayName, string address, bool flush = true) {
             if (flush) FromHeaders.Clear();
             FromHeaders.Add(new Address
             {
@@ -85,7 +85,7 @@ namespace Mailocomotive
         /// <param name="address">The emailaddress of the recipient</param>
         /// <param name="flush">False if the previous recipients in the <code>CC</code> header should be kept</param>
         /// <returns></returns>
-        public Email<T> Cc(string displayName, string address, bool flush = true)
+        public Email<TViewModel> Cc(string displayName, string address, bool flush = true)
         {
             if (flush) CcHeaders.Clear();
             CcHeaders.Add(new Address
@@ -103,7 +103,7 @@ namespace Mailocomotive
         /// <param name="address">The emailaddress of the recipient</param>
         /// <param name="flush">False if the previous recipients in the <code>BCC</code> header should be kept</param>
         /// <returns></returns>
-        public Email<T> Bcc(string displayName, string address, bool flush = true)
+        public Email<TViewModel> Bcc(string displayName, string address, bool flush = true)
         {
             if (flush) BccHeaders.Clear();
             BccHeaders.Add(new Address
@@ -119,7 +119,7 @@ namespace Mailocomotive
         /// </summary>
         /// <param name="subject">The email subject</param>
         /// <returns></returns>
-        public Email<T> Subject(string subject)
+        public Email<TViewModel> Subject(string subject)
         {
             MessageSubject = subject;
             return this;
@@ -130,7 +130,7 @@ namespace Mailocomotive
         /// </summary>
         /// <param name="absolutePathToAttachment">The full absolute path to the attachment file</param>
         /// <returns></returns>
-        public Email<T> Attach(string absolutePathToAttachment)
+        public Email<TViewModel> Attach(string absolutePathToAttachment)
         {
             AttachmentPaths.Add(absolutePathToAttachment);
             return this;
@@ -141,7 +141,7 @@ namespace Mailocomotive
         /// Override this method
         /// </summary>
         /// <returns></returns>
-        public abstract T BuildViewModel();
+        public abstract TViewModel BuildViewModel();
 
         /// <summary>
         /// The path to the razor view of the email
@@ -154,7 +154,7 @@ namespace Mailocomotive
         /// <returns>The rendered email</returns>
         public async System.Threading.Tasks.Task<string> RenderAsync(RenderType type)
         {
-            var renderer = (new Factory.Render.Factory<T>()).Create(type);
+            var renderer = (new Factory.Render.Factory<TViewModel>()).Create(type);
             return (await renderer.RenderAsync(BuildViewModel(), ViewPath)).ToString();
         }
 
@@ -164,8 +164,8 @@ namespace Mailocomotive
         /// <returns>True if sent</returns>
         public async System.Threading.Tasks.Task<bool> SendAsync()
         {
-            var sender = (new Factory.Sender.Factory()).Create();
-            return await sender.Send(this);
+            var sender = (new Factory.Sender.Factory<TViewModel>()).Create();
+            return await sender.SendAsync(this);
         }
     }
 }

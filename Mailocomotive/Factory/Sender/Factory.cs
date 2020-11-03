@@ -1,12 +1,14 @@
 ﻿using Mailocomotive.Configuration;
 using Mailocomotive.Configuration.Multiple;
+using Mailocomotive.Sender.Multiple;
+using Mailocomotive.Sender.Smtp;
 using Mailocomotive.Setting.Multiple;
 using Mailocomotive.Setting.Single;
 using System;
 
 namespace Mailocomotive.Factory.Sender
 {
-    internal class Factory
+    internal class Factory<TViewModel>
     {
         public Factory()
         {
@@ -17,10 +19,10 @@ namespace Mailocomotive.Factory.Sender
         /// Creates a sender depending on the current configuration
         /// </summary>
         /// <returns></returns>
-        internal Mailocomotive.Sender.Sender Create()
+        internal Mailocomotive.Sender.Sender<TViewModel> Create()
         {
             var provider = Api.Configuration().GetProvider();
-            Mailocomotive.Sender.Sender result = null;
+            Mailocomotive.Sender.Sender<TViewModel> result = null;
             if (provider is MailProvider)
             {
                 result = BuildSender(provider);
@@ -36,23 +38,32 @@ namespace Mailocomotive.Factory.Sender
             return result;
         }
 
-        private Mailocomotive.Sender.Sender BuildSender(Setting.Provider provider)
+        private Mailocomotive.Sender.Sender<TViewModel> BuildSender(Setting.Provider provider)
         {
             if(provider is SmtpMailProvider)
             {
-                return new Mailocomotive.Sender.Smtp.SingleMailSender(provider as SmtpMailProvider);
+                return new Mailocomotive.Sender.Smtp.SingleMailSender<TViewModel>(provider as SmtpMailProvider);
             }
             throw new Exception("Unsupported provider");
         }
 
-        private Mailocomotive.Sender.Sender BuildCollectionSender(Setting.Provider provider)
+        private Mailocomotive.Sender.Sender<TViewModel> BuildCollectionSender(Setting.Provider provider)
         {
-            throw new NotImplementedException();
-            if(provider is SmtpMailProviderCollection)
+            var multipleProvider = provider as MailProviderCollection;
+            Mailocomotive.Sender.Sender<TViewModel> result = null;
+            switch (multipleProvider.Strategy)
             {
-                
+                case Strategy.ROTATE:
+                    result = new Mailocomotive.Sender.Smtp.RotatingMailCollectionSender<TViewModel>(multipleProvider);
+                    break;
+                case Strategy.RANDOM:
+                    result = new Mailocomotive.Sender.Smtp.RandomMailCollectionSender<TViewModel>(multipleProvider);
+                    break;
+                default:
+                    throw new Exception("Unsupported provider");
+                    break;
             }
-            throw new Exception("Unsupported provider");
+            return result;
         }
     }
 }
