@@ -23,8 +23,7 @@ namespace Tests.Configuration
             var second = Mailocomotive.Configuration.Api.Configuration();
 
             Assert.IsType(provider.GetType(), second.GetProvider());
-            Assert.Equal(provider.Host,
-                ((Mailocomotive.Setting.Single.SmtpMailProvider)second.GetProvider()).Host);
+            Assert.Equal(first, second);
         }
     }
 }
