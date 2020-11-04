@@ -1,12 +1,12 @@
 ﻿namespace Mailocomotive.Configuration
 {
-    public static class Api
+    public sealed class Api
     {
-        private static GlobalConfiguration globalConfiguration;
+        private static GlobalConfiguration globalConfiguration = new GlobalConfiguration();
 
         public static GlobalConfiguration Configuration()
         {
-            return (globalConfiguration != null) ? globalConfiguration : new GlobalConfiguration();
+            return globalConfiguration;
         }
     }
 }

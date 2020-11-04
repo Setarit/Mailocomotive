@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Xunit;
+﻿using Xunit;
 
 namespace Tests.Configuration
 {
@@ -17,9 +14,17 @@ namespace Tests.Configuration
         [Fact]
         public void ApiReturnsExistingConfigurationIfCalledInThePast()
         {
+            var provider = new Mailocomotive.Setting.Single.SmtpMailProvider()
+            {
+                Host = "test.mail.com",
+            };
             var first = Mailocomotive.Configuration.Api.Configuration();
-            var second = Mailocomotive.Configuration.Api.Configuration();            
-            Assert.True(first.Equals(second));
+            first.UseProvider(provider);
+            var second = Mailocomotive.Configuration.Api.Configuration();
+
+            Assert.IsType(provider.GetType(), second.GetProvider());
+            Assert.Equal(provider.Host,
+                ((Mailocomotive.Setting.Single.SmtpMailProvider)second.GetProvider()).Host);
         }
     }
 }
