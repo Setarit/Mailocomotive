@@ -1,10 +1,9 @@
 ﻿using Mailocomotive.Render;
-using System;
 using Xunit;
 
 namespace Tests.Factory.Render
 {
-    public class FactoryTest:IDisposable
+    public class FactoryTest:Test
     {
         private Mailocomotive.Factory.Render.Factory<int> factory;
 
@@ -15,6 +14,7 @@ namespace Tests.Factory.Render
 
         public void Dispose()
         {
+            base.Dispose();
             factory = null;
         }
 

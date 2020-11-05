@@ -8,7 +8,7 @@ using Xunit;
 
 namespace Tests.Factory.Sender
 {
-    public class Factory:IDisposable
+    public class Factory:Test
     {
         private Factory<int> factory;
 
@@ -59,6 +59,7 @@ namespace Tests.Factory.Sender
 
         public void Dispose()
         {
+            base.Dispose();
             Api.Configuration().UseProvider(null);
         }
     }

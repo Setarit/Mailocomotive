@@ -7,7 +7,7 @@ using Xunit;
 
 namespace Tests.Configuration
 {
-    public class GlobalConfigurationTest
+    public class GlobalConfigurationTest:Test
     {
         [Fact]
         public void UseProviderSetsTheProvider()

@@ -2,7 +2,7 @@
 
 namespace Tests.Configuration
 {
-    public class ApiTest
+    public class ApiTest:Test
     {
         [Fact]
         public void ApiReturnsNewConfigurationIfNotCalledYet()
