@@ -50,5 +50,79 @@ namespace Tests.Message
             File.Delete(fileName2);
         }
 
+        [Fact]
+        public void BuildAddsToHeader()
+        {
+            var address = new Address { DisplayName = "Name", MailAddress = "address@email.com" };
+            var to = new List<Address> { address };
+            var builder = new MimeMessageBuilder("", "", to, null, null, null, null, null);
+            var result = builder.Build();
+
+            var headers = result.To.Mailboxes;
+            Assert.Equal(to.Count, headers.Count());
+            var resultAddress = headers.First();
+            Assert.Equal(address.DisplayName, resultAddress.Name);
+            Assert.Equal(address.MailAddress, resultAddress.Address);
+        }
+
+        [Fact]
+        public void BuildAddsReplyToHeader()
+        {
+            var address = new Address { DisplayName = "Name", MailAddress = "address@email.com" };
+            var replyTo = new List<Address> { address };
+            var builder = new MimeMessageBuilder("", "", null, replyTo, null, null, null, null);
+            var result = builder.Build();
+
+            var headers = result.ReplyTo.Mailboxes;
+            Assert.Equal(replyTo.Count, headers.Count());
+            var resultAddress = headers.First();
+            Assert.Equal(address.DisplayName, resultAddress.Name);
+            Assert.Equal(address.MailAddress, resultAddress.Address);
+        }
+
+        [Fact]
+        public void BuildAddsFromHeader()
+        {
+            var address = new Address { DisplayName = "Name", MailAddress = "address@email.com" };
+            var from = new List<Address> { address };
+            var builder = new MimeMessageBuilder("", "", null, null, from, null, null, null);
+            var result = builder.Build();
+
+            var headers = result.From.Mailboxes;
+            Assert.Equal(from.Count, headers.Count());
+            var resultAddress = headers.First();
+            Assert.Equal(address.DisplayName, resultAddress.Name);
+            Assert.Equal(address.MailAddress, resultAddress.Address);
+        }
+
+        [Fact]
+        public void BuildAddsCcHeader()
+        {
+            var address = new Address { DisplayName = "Name", MailAddress = "address@email.com" };
+            var cc = new List<Address> { address };
+            var builder = new MimeMessageBuilder("", "", null, null, null, cc, null, null);
+            var result = builder.Build();
+
+            var headers = result.Cc.Mailboxes;
+            Assert.Equal(cc.Count, headers.Count());
+            var resultAddress = headers.First();
+            Assert.Equal(address.DisplayName, resultAddress.Name);
+            Assert.Equal(address.MailAddress, resultAddress.Address);
+        }
+
+        [Fact]
+        public void BuildAddsBccHeader()
+        {
+            var address = new Address { DisplayName = "Name", MailAddress = "address@email.com" };
+            var bcc = new List<Address> { address };
+            var builder = new MimeMessageBuilder("", "", null, null, null, null, bcc, null);
+            var result = builder.Build();
+
+            var headers = result.Bcc.Mailboxes;
+            Assert.Equal(bcc.Count, headers.Count());
+            var resultAddress = headers.First();
+            Assert.Equal(address.DisplayName, resultAddress.Name);
+            Assert.Equal(address.MailAddress, resultAddress.Address);
+        }
     }
 }
