@@ -9,6 +9,7 @@ using Moq.Protected;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
@@ -66,21 +67,37 @@ namespace Tests.Sender.Multiple
                 CallCount++;
                 return Task.FromResult(result);
             }
-        }
+
+       }
 
         #endregion
         [Fact]
-        public void ReturnsTrueIfOneSucceeds()
+        public async void SendReturnsTrueIfOneSucceeds()
         {
             var collection = (new MailProviderCollectionStub())
                 .UseCollection(new MailProvider[] {
                 new SingleMailProviderStub(),
                 new SingleMailProviderStub(),
             });
-            var sender = new RandomMailCollectionSenderStub(collection)
+            Sender<int> sender = new RandomMailCollectionSenderStub(collection)
                 .SetSuccessOrder(new List<bool> { true, false });
-            var result = sender.SendAsync(mail);
+            var result = await sender.SendAsync(mail);
+            Assert.True(result);
+        }
 
+        [Fact]
+        public async void SendReturnsFalseIfAllFail()
+        {
+            var collection = (new MailProviderCollectionStub())
+                .UseCollection(new MailProvider[] {
+                new SingleMailProviderStub(),
+                new SingleMailProviderStub(),
+            });
+            Sender<int> sender = new RandomMailCollectionSenderStub(collection)
+                .SetSuccessOrder(new List<bool> { false, false });
+            var result = await sender.SendAsync(mail);
+            Assert.False(result);
+            Assert.Equal(2, ((RandomMailCollectionSenderStub)sender).CallCount);
         }
     }
 }

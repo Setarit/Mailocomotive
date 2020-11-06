@@ -30,17 +30,20 @@ namespace Mailocomotive.Sender.Multiple
             do
             {
                 var providerIndex = random.Next(0, mailProviderCollection.Collection.Length);
-                try
+                if (!used[providerIndex])
                 {
-                    sent = await SendWithProvider(mailProviderCollection.Collection[providerIndex], mail);
-                }
-                catch (Exception e)
-                {
-                    lastException = e;
-                }
-                finally
-                {
-                    used[providerIndex] = true;
+                    try
+                    {
+                        sent = await SendWithProvider(mailProviderCollection.Collection[providerIndex], mail);
+                    }
+                    catch (Exception e)
+                    {
+                        lastException = e;
+                    }
+                    finally
+                    {
+                        used[providerIndex] = true;
+                    }
                 }
             } while (!sent && used.Any(u => !u));
             if(!sent && lastException != null)
