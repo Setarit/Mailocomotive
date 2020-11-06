@@ -1,8 +1,7 @@
-﻿using Mailocomotive.Setting.Multiple;
-using Mailocomotive.Setting.Single;
+﻿using Mailocomotive.Setting.Single;
 using System.Linq;
 
-namespace Mailocomotive.Configuration.Multiple.Smtp
+namespace Mailocomotive.Setting.Multiple.Smtp
 {
     public class SmtpMailProviderCollection : MailProviderCollection
     {

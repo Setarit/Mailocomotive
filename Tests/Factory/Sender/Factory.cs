@@ -1,7 +1,7 @@
 ﻿using Mailocomotive.Configuration;
-using Mailocomotive.Configuration.Multiple.Smtp;
 using Mailocomotive.Factory.Sender;
 using Mailocomotive.Sender.Smtp;
+using Mailocomotive.Setting.Multiple.Smtp;
 using Mailocomotive.Setting.Single;
 using System;
 using Xunit;

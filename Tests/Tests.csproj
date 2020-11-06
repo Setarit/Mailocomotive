@@ -17,4 +17,10 @@
     <ProjectReference Include="..\Mailocomotive\Mailocomotive.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Views\Dummy.cshtml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>
