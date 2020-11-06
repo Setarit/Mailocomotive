@@ -2,16 +2,10 @@
 using Mailocomotive.Sender;
 using Mailocomotive.Sender.Multiple;
 using Mailocomotive.Setting.Multiple;
-using Mailocomotive.Setting.Multiple.Smtp;
 using Mailocomotive.Setting.Single;
-using Moq;
-using Moq.Protected;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -20,12 +14,16 @@ namespace Tests.Sender.Multiple
     public class RandomMailCollectionSenderTest : Test
     {
         private Email<int> mail;
-        private MailProviderCollection providerCollection;
+        private MailProviderCollection collection;
 
         public RandomMailCollectionSenderTest()
         {
             mail = new MailStub();
-            providerCollection = new SmtpMailProviderCollection();
+            collection = (new MailProviderCollectionStub())
+                .UseCollection(new MailProvider[] {
+                new SingleMailProviderStub(),
+                new SingleMailProviderStub(),
+            });
         }
         #region stubs
         class MailStub : Email<int>
@@ -50,10 +48,13 @@ namespace Tests.Sender.Multiple
         {
             public int CallCount { get; private set; }
             private IList<bool> successOrder;
+            private IList<bool> throwOrder;
 
             public RandomMailCollectionSenderStub(MailProviderCollection providerCollection):base(providerCollection)
             {
                 CallCount = 0;
+                successOrder = Enumerable.Repeat(false, providerCollection.Collection.Length).ToList();
+                throwOrder = Enumerable.Repeat(false, providerCollection.Collection.Length).ToList();
             }
             public RandomMailCollectionSenderStub SetSuccessOrder(IList<bool> order)
             {
@@ -61,24 +62,29 @@ namespace Tests.Sender.Multiple
                 return this;
             }
 
-            protected override Task<bool> SendWithProvider(MailProvider mailProvider, Email<int> mail)
+            public RandomMailCollectionSenderStub SetThrowOrder(IList<bool> order)
             {
-                var result = (successOrder[CallCount]);
-                CallCount++;
-                return Task.FromResult(result);
+                throwOrder = order;
+                return this;
             }
 
+            protected override Task<bool> SendWithProvider(MailProvider mailProvider, Email<int> mail)
+            {
+                var currentCallCount = CallCount;
+                CallCount++;
+                var result = (successOrder[currentCallCount]);
+                if (throwOrder[currentCallCount])
+                {
+                    throw new Exception("Failure " + currentCallCount);
+                }
+                return Task.FromResult(result);
+            }
        }
 
         #endregion
         [Fact]
         public async void SendReturnsTrueIfOneSucceeds()
         {
-            var collection = (new MailProviderCollectionStub())
-                .UseCollection(new MailProvider[] {
-                new SingleMailProviderStub(),
-                new SingleMailProviderStub(),
-            });
             Sender<int> sender = new RandomMailCollectionSenderStub(collection)
                 .SetSuccessOrder(new List<bool> { true, false });
             var result = await sender.SendAsync(mail);
@@ -88,16 +94,44 @@ namespace Tests.Sender.Multiple
         [Fact]
         public async void SendReturnsFalseIfAllFail()
         {
-            var collection = (new MailProviderCollectionStub())
-                .UseCollection(new MailProvider[] {
-                new SingleMailProviderStub(),
-                new SingleMailProviderStub(),
-            });
             Sender<int> sender = new RandomMailCollectionSenderStub(collection)
                 .SetSuccessOrder(new List<bool> { false, false });
             var result = await sender.SendAsync(mail);
             Assert.False(result);
             Assert.Equal(2, ((RandomMailCollectionSenderStub)sender).CallCount);
+        }
+
+        [Fact]
+        public async void SendDoesNotThrowIfSecondSucceeds()
+        {
+            Sender<int> sender = new RandomMailCollectionSenderStub(collection)
+                .SetSuccessOrder(new List<bool> { false, true })
+                .SetThrowOrder(new List<bool> { true, false });
+            var result = await sender.SendAsync(mail);
+            Assert.True(result);
+            Assert.Equal(2, ((RandomMailCollectionSenderStub)sender).CallCount);
+        }
+
+        [Fact]
+        public async void SendThrowsErrorOfFirstCallIfFirstThrowsButAllFailing()
+        {
+            Sender<int> sender = new RandomMailCollectionSenderStub(collection)
+                .SetSuccessOrder(new List<bool> { false, false })
+                .SetThrowOrder(new List<bool> { true, false });
+            var message = await Assert.ThrowsAsync<Exception>(() => sender.SendAsync(mail));
+            Assert.Equal(2, ((RandomMailCollectionSenderStub)sender).CallCount);
+            Assert.Equal("Failure 0", message.Message);
+        }
+
+        [Fact]
+        public async void SendThrowsErrorLastErrorIfAllFailingAndThrowing()
+        {
+            Sender<int> sender = new RandomMailCollectionSenderStub(collection)
+                .SetSuccessOrder(new List<bool> { false, false })
+                .SetThrowOrder(new List<bool> { true, true });
+            var message = await Assert.ThrowsAsync<Exception>(() => sender.SendAsync(mail));
+            Assert.Equal(2, ((RandomMailCollectionSenderStub)sender).CallCount);
+            Assert.Equal("Failure 1", message.Message);
         }
     }
 }
