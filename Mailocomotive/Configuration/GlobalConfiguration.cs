@@ -17,6 +17,7 @@ namespace Mailocomotive.Configuration
         public GlobalConfiguration()
         {
             projectRoot = Directory.GetCurrentDirectory();
+            RebuildRazorEngine();
         }
 
         /// <summary>
