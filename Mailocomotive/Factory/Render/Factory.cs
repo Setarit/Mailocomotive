@@ -5,7 +5,7 @@ namespace Mailocomotive.Factory.Render
 {
     internal class Factory<TViewModel>
     {
-        internal Renderer<TViewModel> Create(RenderType type)
+        internal virtual Renderer<TViewModel> Create(RenderType type)
         {
             Renderer<TViewModel> result = null;
             switch (type)
