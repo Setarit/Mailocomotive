@@ -3,9 +3,9 @@ using System;
 
 namespace Mailocomotive.Factory.Render
 {
-    internal class Factory<TViewModel>
+    public class Factory<TViewModel> : Contract<TViewModel>
     {
-        internal virtual Renderer<TViewModel> Create(RenderType type)
+        public Renderer<TViewModel> Create(RenderType type)
         {
             Renderer<TViewModel> result = null;
             switch (type)
@@ -14,7 +14,7 @@ namespace Mailocomotive.Factory.Render
                     result = new StringRenderer<TViewModel>();
                     break;
                 default:
-                    throw new Exception("Unsupported render type");                    
+                    throw new Exception("Unsupported render type");
             }
             return result;
         }

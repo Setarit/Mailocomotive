@@ -5,7 +5,7 @@ using System;
 
 namespace Mailocomotive.Factory.Sender
 {
-    internal class Factory<TViewModel>
+    internal class Factory<TViewModel>:Contract<TViewModel>
     {
         public Factory()
         {
@@ -16,7 +16,7 @@ namespace Mailocomotive.Factory.Sender
         /// Creates a sender depending on the current configuration
         /// </summary>
         /// <returns></returns>
-        internal Mailocomotive.Sender.Sender<TViewModel> Create()
+        public Mailocomotive.Sender.Sender<TViewModel> Create()
         {
             var provider = Api.Configuration().GetProvider();
             Mailocomotive.Sender.Sender<TViewModel> result = null;

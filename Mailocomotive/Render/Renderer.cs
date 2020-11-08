@@ -2,7 +2,7 @@
 
 namespace Mailocomotive.Render
 {
-    internal interface Renderer<TViewModel>
+    public interface Renderer<TViewModel>
     {
         /// <summary>
         /// Renders the email

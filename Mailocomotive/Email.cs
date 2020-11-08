@@ -154,7 +154,7 @@ namespace Mailocomotive
         /// <returns>The rendered email</returns>
         public async System.Threading.Tasks.Task<string> RenderAsync(RenderType type)
         {
-            var renderer = (new Factory.Render.Factory<TViewModel>()).Create(type);
+            Renderer<TViewModel> renderer = (new Factory.Render.Factory<TViewModel>()).Create(type);
             return (await renderer.RenderAsync(BuildViewModel(), ViewPath)).ToString();
         }
 

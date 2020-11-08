@@ -2,7 +2,7 @@
 
 namespace Mailocomotive.Sender
 {
-    internal interface Sender<TViewModel>
+    public interface Sender<TViewModel>
     {
         /// <summary>
         /// Sends the <paramref name="mail"/>
