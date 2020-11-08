@@ -1,4 +1,6 @@
 ﻿using Mailocomotive.Setting;
+using RazorLight;
+using System.IO;
 
 namespace Mailocomotive.Configuration
 {
@@ -9,6 +11,13 @@ namespace Mailocomotive.Configuration
     public class GlobalConfiguration
     {
         private Provider mailProviderSetting;
+        private string projectRoot;
+        private RazorLightEngine razorEngine;
+
+        public GlobalConfiguration()
+        {
+            projectRoot = Directory.GetCurrentDirectory();
+        }
 
         /// <summary>
         /// Set the mail provider setting
@@ -26,5 +35,40 @@ namespace Mailocomotive.Configuration
         /// </summary>
         /// <returns></returns>
         internal Provider GetProvider() { return mailProviderSetting; }
+
+        /// <summary>
+        /// Overrides the root folder of the project
+        /// </summary>
+        /// <param name="absolutePath"></param>
+        /// <returns></returns>
+        public GlobalConfiguration UseProjectRoot(string absolutePath)
+        {
+            projectRoot = absolutePath;
+            RebuildRazorEngine();
+            return this;
+        }
+
+        /// <summary>
+        /// Gets the project root
+        /// </summary>
+        /// <returns></returns>
+        internal string GetProjectRoot()
+        {
+            return projectRoot;
+        }
+
+        /// <summary>
+        /// Gets the Razor engine to compile the views
+        /// <returns>The razor engine</returns>
+        /// </summary>
+        internal RazorLightEngine GetRazorEngine()
+        {
+            return razorEngine;
+        }
+
+        private void RebuildRazorEngine()
+        {
+            razorEngine = new RazorLightEngineBuilder().UseFileSystemProject(GetProjectRoot()).UseMemoryCachingProvider().Build();
+        }
     }
 }

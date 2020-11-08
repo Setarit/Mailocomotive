@@ -1,4 +1,4 @@
-﻿using Razor.Templating.Core;
+﻿using Mailocomotive.Configuration;
 
 namespace Mailocomotive.Render
 {
@@ -6,7 +6,8 @@ namespace Mailocomotive.Render
     {
         public async System.Threading.Tasks.Task<object> RenderAsync(TViewModel viewModel, string view)
         {
-            return await RazorTemplateEngine.RenderAsync(view, viewModel);
+            var engine = Api.Configuration().GetRazorEngine();
+            return await engine.CompileRenderAsync<TViewModel>(view, viewModel);
         }
     }
 }
